@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PulseForge OS — Bio-Adaptive Fitness & TACO Nutrition</title>
+  <link rel="manifest" href="./manifest.json" />
+  <meta name="theme-color" content="#10b981" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { background-color: #06090f; color: #e2e8f0; font-family: Inter, system-ui, sans-serif; }
+    .glass { background: rgba(15, 23, 42, 0.78); backdrop-filter: blur(12px); border: 1px solid rgba(148, 163, 184, 0.14); }
+    .tab-active { background: #10b981; color: #06090f; font-weight: 700; }
+  </style>
+</head>
+<body class="min-h-screen pb-12">
+  <header class="sticky top-0 z-30 glass border-b border-slate-800 px-4 py-3">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-emerald-400 font-black">PF</div>
+        <div>
+          <h1 class="text-lg font-bold tracking-tight text-white">PulseForge OS</h1>
+          <p class="text-xs text-slate-400">Bio-Adaptive Fitness • TACO 4ª Ed. • AES-256</p>
+        </div>
+      </div>
+      <nav id="navTabs" class="flex flex-wrap gap-2 text-xs sm:text-sm">
+        <button data-tab="command" class="tab-btn tab-active px-3 py-1.5 rounded-lg transition">Command Center</button>
+        <button data-tab="workout" class="tab-btn px-3 py-1.5 rounded-lg bg-slate-800/70 hover:bg-slate-700 transition">Treino Dual-Mode</button>
+        <button data-tab="muscle" class="tab-btn px-3 py-1.5 rounded-lg bg-slate-800/70 hover:bg-slate-700 transition">Mapa Muscular & 1RM</button>
+        <button data-tab="taco" class="tab-btn px-3 py-1.5 rounded-lg bg-slate-800/70 hover:bg-slate-700 transition">Dieta TACO & Trocas</button>
+        <button data-tab="social" class="tab-btn px-3 py-1.5 rounded-lg bg-slate-800/70 hover:bg-slate-700 transition">Clubes & Card 9:16 + Cofre</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 mt-6 space-y-6">
+    <!-- TAB 1: COMMAND CENTER -->
+    <section id="tab-command" class="tab-panel space-y-6">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="glass rounded-2xl p-4">
+          <p class="text-xs text-slate-400">Calorias Consumidas / Meta</p>
+          <p class="text-2xl font-bold text-white mt-1"><span id="kpiKcal">0</span> <span class="text-sm font-normal text-slate-400">/ <span id="kpiKcalTarget">2450</span> kcal</span></p>
+          <div class="w-full bg-slate-800 h-2 rounded-full mt-3"><div id="barKcal" class="bg-emerald-500 h-2 rounded-full" style="width:0%"></div></div>
+        </div>
+        <div class="glass rounded-2xl p-4">
+          <p class="text-xs text-slate-400">Proteína Diária</p>
+          <p class="text-2xl font-bold text-white mt-1"><span id="kpiProt">0</span>g <span class="text-sm font-normal text-slate-400">/ <span id="kpiProtTarget">160</span>g</span></p>
+          <div class="w-full bg-slate-800 h-2 rounded-full mt-3"><div id="barProt" class="bg-sky-500 h-2 rounded-full" style="width:0%"></div></div>
+        </div>
+        <div class="glass rounded-2xl p-4">
+          <p class="text-xs text-slate-400">Hidratação</p>
+          <p class="text-2xl font-bold text-white mt-1"><span id="kpiWater">1500</span> <span class="text-sm font-normal text-slate-400">/ 3000 ml</span></p>
+          <div class="flex gap-2 mt-3">
+            <button onclick="addWater(250)" class="px-2.5 py-1 text-xs rounded-lg bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 hover:bg-cyan-500/30">+250 ml</button>
+            <button onclick="addWater(500)" class="px-2.5 py-1 text-xs rounded-lg bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 hover:bg-cyan-500/30">+500 ml</button>
+          </div>
+        </div>
+        <div class="glass rounded-2xl p-4">
+          <p class="text-xs text-slate-400">Prontidão Bio-Adaptativa</p>
+          <p class="text-2xl font-bold text-emerald-400 mt-1"><span id="readinessScore">84</span>/100</p>
+          <p id="readinessAdvice" class="text-xs text-slate-300 mt-2">Volume: 100% • RIR alvo: 1–2</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="glass rounded-2xl p-5 space-y-4">
+          <h2 class="text-base font-bold text-white">Autorregulação Fisiológica (0–100)</h2>
+          <div>
+            <label class="flex justify-between text-xs text-slate-300"><span>Horas de Sono</span><span id="valSleep">7.5h</span></label>
+            <input id="slSleep" type="range" min="4" max="10" step="0.5" value="7.5" class="w-full accent-emerald-500" oninput="calcReadiness()" />
+          </div>
+          <div>
+            <label class="flex justify-between text-xs text-slate-300"><span>Qualidade do Sono (1–10)</span><span id="valQuality">8</span></label>
+            <input id="slQuality" type="range" min="1" max="10" value="8" class="w-full accent-emerald-500" oninput="calcReadiness()" />
+          </div>
+          <div>
+            <label class="flex justify-between text-xs text-slate-300"><span>DOMS / Dor Muscular (1–10)</span><span id="valDoms">3</span></label>
+            <input id="slDoms" type="range" min="1" max="10" value="3" class="w-full accent-amber-500" oninput="calcReadiness()" />
+          </div>
+          <div>
+            <label class="flex justify-between text-xs text-slate-300"><span>Estresse SNC (1–10)</span><span id="valStress">3</span></label>
+            <input id="slStress" type="range" min="1" max="10" value="3" class="w-full accent-rose-500" oninput="calcReadiness()" />
+          </div>
+        </div>
+
+        <div class="glass rounded-2xl p-5 lg:col-span-2 space-y-4">
+          <div class="flex flex-wrap justify-between items-center gap-2">
+            <div>
+              <h2 class="text-base font-bold text-white">Tendência de Peso EWMA & TDEE Adaptativo</h2>
+              <p class="text-xs text-slate-400">Mifflin-St Jeor + ajuste dinâmico pela variação semanal EWMA</p>
+            </div>
+            <div class="text-right">
+              <span class="text-xs text-slate-400 block">TDEE Adaptativo Estimado</span>
+              <span id="tdeeValue" class="text-lg font-bold text-emerald-400">2710 kcal/dia</span>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+            <input id="pfWeight" type="number" step="0.1" value="80.0" class="bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5" placeholder="Peso (kg)" onchange="updateTdeeChart()" />
+            <input id="pfHeight" type="number" value="178" class="bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5" placeholder="Altura (cm)" onchange="updateTdeeChart()" />
+            <input id="pfAge" type="number" value="28" class="bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5" placeholder="Idade" onchange="updateTdeeChart()" />
+            <select id="pfActivity" class="bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5" onchange="updateTdeeChart()">
+              <option value="1.375">Leve (1.375)</option>
+              <option value="1.55" selected>Moderado (1.55)</option>
+              <option value="1.725">Intenso (1.725)</option>
+            </select>
+          </div>
+          <div class="h-56"><canvas id="ewmaChart"></canvas></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: TREINO DUAL-MODE -->
+    <section id="tab-workout" class="tab-panel hidden space-y-6">
+      <div class="glass rounded-2xl p-5 flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h2 class="text-lg font-bold text-white">Estação de Treino Dual-Mode</h2>
+          <p class="text-xs text-slate-400">Alterne entre Modo Ao Vivo (cronômetro e Bi-sets) ou Modo Expresso Pós-Treino</p>
+        </div>
+        <div class="flex gap-2">
+          <button id="btnModeLive" onclick="setWorkoutMode('live')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-500 text-slate-950">Modo Ao Vivo</button>
+          <button id="btnModeExpress" onclick="setWorkoutMode('express')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-200">Modo Expresso</button>
+        </div>
+      </div>
+
+      <div id="liveTimerBox" class="glass rounded-2xl p-5 flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <p class="text-xs text-slate-400">Cronômetro de Descanso</p>
+          <p id="restDisplay" class="text-3xl font-mono font-bold text-emerald-400">01:30</p>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <button onclick="startRest(60)" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs">60s</button>
+          <button onclick="startRest(90)" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs">90s</button>
+          <button onclick="startRest(120)" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs">120s</button>
+          <button onclick="stopRest()" class="px-3 py-1.5 rounded-lg bg-rose-500/20 text-rose-300 text-xs">Parar</button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="glass rounded-2xl p-5 space-y-3">
+          <h3 class="font-bold text-white text-sm">Registrar Série / Lote</h3>
+          <div class="grid grid-cols-2 gap-3 text-sm">
+            <input id="wExercise" type="text" placeholder="Exercício (ex: Supino Reto)" class="col-span-2 bg-slate-900 border border-slate-700 rounded-lg px-3 py-2" />
+            <select id="wMuscle" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2">
+              <option value="Peito">Peito</option>
+              <option value="Costas">Costas</option>
+              <option value="Quadríceps">Quadríceps</option>
+              <option value="Posterior">Posterior</option>
+              <option value="Ombros">Ombros</option>
+              <option value="Braços">Braços</option>
+            </select>
+            <input id="wSets" type="number" value="3" min="1" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2" placeholder="Séries" />
+            <input id="wLoad" type="number" value="80" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2" placeholder="Carga (kg)" />
+            <input id="wReps" type="number" value="10" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2" placeholder="Reps" />
+            <input id="wRpe" type="number" step="0.5" min="5" max="10" value="8.5" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2" placeholder="RPE" />
+            <label class="flex items-center gap-2 text-xs text-slate-300"><input id="wBiset" type="checkbox" class="accent-emerald-500" /> Marcar como Bi-Set</label>
+          </div>
+          <button onclick="logWorkout()" class="w-full py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-sm transition">Salvar no Histórico</button>
+        </div>
+
+        <div class="glass rounded-2xl p-5 space-y-3">
+          <h3 class="font-bold text-white text-sm">Histórico da Sessão</h3>
+          <ul id="workoutHistory" class="space-y-2 text-xs text-slate-300 max-h-64 overflow-y-auto"></ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: MAPA MUSCULAR & 1RM -->
+    <section id="tab-muscle" class="tab-panel hidden space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="glass rounded-2xl p-5 flex flex-col items-center">
+          <h2 class="text-base font-bold text-white mb-3">Mapa Anatômico SVG (10–20 séries/sem)</h2>
+          <svg viewBox="0 0 200 320" class="w-48 h-72">
+            <circle cx="100" cy="30" r="18" fill="#334155" />
+            <rect id="svg-Ombros" x="55" y="55" width="90" height="22" rx="8" fill="#10b981" opacity="0.8" />
+            <rect id="svg-Peito" x="68" y="80" width="64" height="36" rx="6" fill="#10b981" opacity="0.85" />
+            <rect id="svg-Costas" x="72" y="120" width="56" height="34" rx="6" fill="#0ea5e9" opacity="0.7" />
+            <rect id="svg-Braços" x="35" y="78" width="22" height="70" rx="8" fill="#10b981" opacity="0.7" />
+            <rect x="143" y="78" width="22" height="70" rx="8" fill="#10b981" opacity="0.7" />
+            <rect id="svg-Quadríceps" x="65" y="165" width="30" height="75" rx="8" fill="#f59e0b" opacity="0.8" />
+            <rect x="105" y="165" width="30" height="75" rx="8" fill="#f59e0b" opacity="0.8" />
+            <rect id="svg-Posterior" x="68" y="246" width="24" height="55" rx="6" fill="#64748b" opacity="0.8" />
+            <rect x="108" y="246" width="24" height="55" rx="6" fill="#64748b" opacity="0.8" />
+          </svg>
+          <p class="text-[11px] text-slate-400 mt-2 text-center">Verde: Zona ideal (10–20) • Âmbar: Abaixo • Vermelho: Acima</p>
+        </div>
+
+        <div class="glass rounded-2xl p-5 space-y-3">
+          <h2 class="text-base font-bold text-white">Séries Semanais por Grupamento</h2>
+          <div id="muscleVolumeList" class="space-y-2.5 text-xs"></div>
+        </div>
+
+        <div class="glass rounded-2xl p-5 space-y-4">
+          <h2 class="text-base font-bold text-white">Laboratório 1RM & Anilhas (Barra 20kg)</h2>
+          <div class="grid grid-cols-2 gap-2 text-sm">
+            <input id="rmLoad" type="number" value="100" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2" placeholder="Carga (kg)" oninput="calc1RM()" />
+            <input id="rmReps" type="number" value="5" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2" placeholder="Reps" oninput="calc1RM()" />
+          </div>
+          <div class="bg-slate-900/80 rounded-xl p-3 text-xs space-y-1">
+            <p>Epley 1RM: <strong id="rmEpley" class="text-emerald-400">116.7 kg</strong></p>
+            <p>Brzycki 1RM: <strong id="rmBrzycki" class="text-sky-400">112.5 kg</strong></p>
+          </div>
+          <div>
+            <label class="text-xs text-slate-400">Peso Total Desejado para Montagem (kg)</label>
+            <input id="plateTarget" type="number" value="100" step="2.5" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm" oninput="calcPlates()" />
+            <p id="plateResult" class="text-xs text-emerald-300 mt-2"></p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: DIETA TACO & TROCAS -->
+    <section id="tab-taco" class="tab-panel hidden space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="glass rounded-2xl p-5 space-y-4">
+          <h2 class="text-base font-bold text-white">Parser Rápido TACO 4ª Edição</h2>
+          <p class="text-xs text-slate-400">Digite alimentos e gramas (ex: <code>150g frango, 200g arroz, 100g feijao</code>)</p>
+          <div class="flex gap-2">
+            <input id="tacoInput" type="text" value="150g frango, 200g arroz, 100g feijao, 10g azeite" class="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm" />
+            <button onclick="parseTacoText()" class="px-4 py-2 rounded-lg bg-emerald-500 text-slate-950 font-bold text-sm">Adicionar</button>
+          </div>
+          <ul id="tacoLog" class="space-y-1.5 text-xs text-slate-300 max-h-48 overflow-y-auto"></ul>
+        </div>
+
+        <div class="glass rounded-2xl p-5 space-y-4">
+          <h2 class="text-base font-bold text-white">Substituição Equivalente (TACO 4ª Ed.)</h2>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+            <select id="subFrom" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2" onchange="calcSubstitution()"></select>
+            <input id="subGrams" type="number" value="150" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2" oninput="calcSubstitution()" />
+            <select id="subTo" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2" onchange="calcSubstitution()"></select>
+            <select id="subType" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2" onchange="calcSubstitution()">
+              <option value="kcal">Iso-Calórica (kcal)</option>
+              <option value="prot">Iso-Proteica (g P)</option>
+              <option value="carb">Iso-Glicídica (g C)</option>
+            </select>
+          </div>
+          <div id="subResult" class="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-sm text-emerald-300"></div>
+        </div>
+      </div>
+
+      <div class="glass rounded-2xl p-5 overflow-x-auto">
+        <h3 class="text-sm font-bold text-white mb-3">Tabela Oficial TACO 4ª Edição (por 100g)</h3>
+        <table class="w-full text-left text-xs">
+          <thead class="text-slate-400 border-b border-slate-800">
+            <tr><th class="py-2">Alimento</th><th>Kcal</th><th>Proteína (g)</th><th>Carboidrato (g)</th><th>Gordura (g)</th></tr>
+          </thead>
+          <tbody id="tacoTableBody" class="divide-y divide-slate-800/60"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- TAB 5: CLUBES & CARD 9:16 + COFRE AES-256 -->
+    <section id="tab-social" class="tab-panel hidden space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="glass rounded-2xl p-5 space-y-3">
+          <h2 class="text-base font-bold text-white">Ranking Desafio 90 Dias</h2>
+          <ol class="space-y-2 text-xs">
+            <li class="flex justify-between p-2 rounded-lg bg-emerald-500/15 border border-emerald-500/30"><span>1. Bruno Thals (Você)</span><span class="font-bold text-emerald-400">94% aderência</span></li>
+            <li class="flex justify-between p-2 rounded-lg bg-slate-900"><span>2. Marina Costa</span><span>91% aderência</span></li>
+            <li class="flex justify-between p-2 rounded-lg bg-slate-900"><span>3. Rafael Lima</span><span>88% aderência</span></li>
+            <li class="flex justify-between p-2 rounded-lg bg-slate-900"><span>4. Camila Souza</span><span>84% aderência</span></li>
+          </ol>
+        </div>
+
+        <div class="glass rounded-2xl p-5 space-y-3 flex flex-col items-center">
+          <h2 class="text-base font-bold text-white self-start">Estúdio Card 9:16 (Stories/TikTok)</h2>
+          <canvas id="storyCanvas" width="270" height="480" class="rounded-xl border border-slate-700"></canvas>
+          <div class="flex gap-2 w-full">
+            <button onclick="renderStoryCard()" class="flex-1 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-semibold">Atualizar Card</button>
+            <button onclick="downloadStoryCard()" class="flex-1 py-2 rounded-lg bg-emerald-500 text-slate-950 text-xs font-bold">Baixar PNG</button>
+          </div>
+        </div>
+
+        <div class="glass rounded-2xl p-5 space-y-3">
+          <h2 class="text-base font-bold text-white">Cofre Local AES-GCM 256-bit</h2>
+          <p class="text-xs text-slate-400">Criptografia Web Crypto API (PBKDF2 + AES-GCM). Zero rastreamento GPS.</p>
+          <input id="vaultPass" type="password" placeholder="Senha mestra do cofre" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm" />
+          <div class="flex gap-2">
+            <button onclick="encryptVault()" class="flex-1 py-2 rounded-lg bg-emerald-500 text-slate-950 font-bold text-xs">Criptografar</button>
+            <button onclick="decryptVault()" class="flex-1 py-2 rounded-lg bg-sky-500 text-slate-950 font-bold text-xs">Descriptografar</button>
+          </div>
+          <textarea id="vaultOutput" rows="7" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-[11px] font-mono text-emerald-300" placeholder="Blob AES-GCM 256-bit aparecerá aqui..."></textarea>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const TACO_DB = [
+      { id: 'arroz', name: 'Arroz cozido', kcal: 128, prot: 2.5, carb: 28.1, fat: 0.2 },
+      { id: 'feijao', name: 'Feijão carioca cozido', kcal: 76, prot: 4.8, carb: 13.6, fat: 0.5 },
+      { id: 'frango', name: 'Peito de frango grelhado', kcal: 159, prot: 32.0, carb: 0.0, fat: 2.5 },
+      { id: 'patinho', name: 'Patinho grelhado', kcal: 219, prot: 35.9, carb: 0.0, fat: 7.3 },
+      { id: 'batata', name: 'Batata doce cozida', kcal: 77, prot: 0.6, carb: 18.4, fat: 0.1 },
+      { id: 'mandioca', name: 'Mandioca cozida', kcal: 125, prot: 0.6, carb: 30.1, fat: 0.3 },
+      { id: 'ovo', name: 'Ovo de galinha cozido', kcal: 146, prot: 13.3, carb: 0.6, fat: 9.5 },
+      { id: 'aveia', name: 'Aveia em flocos', kcal: 394, prot: 13.9, carb: 66.6, fat: 8.5 },
+      { id: 'pao', name: 'Pão de forma integral', kcal: 253, prot: 9.4, carb: 49.9, fat: 3.7 },
+      { id: 'banana', name: 'Banana prata', kcal: 98, prot: 1.3, carb: 26.0, fat: 0.1 },
+      { id: 'queijo', name: 'Queijo minas frescal', kcal: 264, prot: 17.4, carb: 3.2, fat: 20.2 },
+      { id: 'azeite', name: 'Azeite de oliva', kcal: 884, prot: 0.0, carb: 0.0, fat: 100.0 }
+    ];
+
+    const state = {
+      waterMl: 1500,
+      kcal: 0,
+      prot: 0,
+      workouts: [],
+      muscleSets: { Peito: 12, Costas: 14, Quadríceps: 8, Posterior: 10, Ombros: 12, Braços: 10 },
+      restInterval: null,
+      restRemaining: 90,
+      chart: null
+    };
+
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('tab-active'));
+        btn.classList.add('tab-active');
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden'));
+        document.getElementById('tab-' + btn.dataset.tab).classList.remove('hidden');
+      });
+    });
+
+    function addWater(ml) {
+      state.waterMl += ml;
+      document.getElementById('kpiWater').textContent = state.waterMl;
+    }
+
+    function calcReadiness() {
+      const sleep = parseFloat(document.getElementById('slSleep').value);
+      const qual = parseInt(document.getElementById('slQuality').value);
+      const doms = parseInt(document.getElementById('slDoms').value);
+      const stress = parseInt(document.getElementById('slStress').value);
+      document.getElementById('valSleep').textContent = sleep + 'h';
+      document.getElementById('valQuality').textContent = qual;
+      document.getElementById('valDoms').textContent = doms;
+      document.getElementById('valStress').textContent = stress;
+      const score = Math.max(0, Math.min(100, Math.round((sleep / 8) * 35 + qual * 3.5 - doms * 2 - stress * 2 + 20)));
+      document.getElementById('readinessScore').textContent = score;
+      const adv = score >= 80 ? 'Volume: 100% • RIR alvo: 1–2' : score >= 60 ? 'Volume: 85% • RIR alvo: 2–3' : 'Deload sugerido: 60% • RIR 4';
+      document.getElementById('readinessAdvice').textContent = adv;
+    }
+
+    function updateTdeeChart() {
+      const w = parseFloat(document.getElementById('pfWeight').value) || 80;
+      const h = parseFloat(document.getElementById('pfHeight').value) || 178;
+      const a = parseFloat(document.getElementById('pfAge').value) || 28;
+      const act = parseFloat(document.getElementById('pfActivity').value) || 1.55;
+      const bmr = 10 * w + 6.25 * h - 5 * a + 5;
+      const tdee = Math.round(bmr * act);
+      document.getElementById('tdeeValue').textContent = tdee + ' kcal/dia';
+      document.getElementById('kpiKcalTarget').textContent = tdee - 250;
+      document.getElementById('kpiProtTarget').textContent = Math.round(w * 2);
+
+      const rawWeights = [w + 0.6, w + 0.3, w + 0.5, w + 0.1, w + 0.2, w - 0.1, w];
+      const ewma = [];
+      rawWeights.forEach((val, idx) => ewma.push(idx === 0 ? val : +(0.3 * val + 0.7 * ewma[idx - 1]).toFixed(2)));
+      const ctx = document.getElementById('ewmaChart').getContext('2d');
+      if (state.chart) state.chart.destroy();
+      state.chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'],
+          datasets: [
+            { label: 'Peso Bruto (kg)', data: rawWeights, borderColor: '#64748b', borderDash: [4, 4], tension: 0.2 },
+            { label: 'Tendência EWMA (kg)', data: ewma, borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.15)', fill: true, tension: 0.3 }
+          ]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#cbd5e1' } } }, scales: { x: { ticks: { color: '#94a3b8' } }, y: { ticks: { color: '#94a3b8' } } } }
+      });
+    }
+
+    function setWorkoutMode(mode) {
+      const liveBox = document.getElementById('liveTimerBox');
+      const bLive = document.getElementById('btnModeLive');
+      const bExp = document.getElementById('btnModeExpress');
+      if (mode === 'live') {
+        liveBox.classList.remove('hidden');
+        bLive.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-500 text-slate-950';
+        bExp.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-200';
+      } else {
+        liveBox.classList.add('hidden');
+        bExp.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-500 text-slate-950';
+        bLive.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-200';
+      }
+    }
+
+    function startRest(sec) {
+      stopRest();
+      state.restRemaining = sec;
+      const updateDisp = () => {
+        const m = String(Math.floor(state.restRemaining / 60)).padStart(2, '0');
+        const s = String(state.restRemaining % 60).padStart(2, '0');
+        document.getElementById('restDisplay').textContent = `${m}:${s}`;
+      };
+      updateDisp();
+      state.restInterval = setInterval(() => {
+        if (state.restRemaining > 0) { state.restRemaining--; updateDisp(); } else { stopRest(); }
+      }, 1000);
+    }
+
+    function stopRest() { if (state.restInterval) clearInterval(state.restInterval); }
+
+    function logWorkout() {
+      const ex = document.getElementById('wExercise').value.trim() || 'Exercício';
+      const muscle = document.getElementById('wMuscle').value;
+      const sets = parseInt(document.getElementById('wSets').value) || 1;
+      const load = parseFloat(document.getElementById('wLoad').value) || 0;
+      const reps = parseInt(document.getElementById('wReps').value) || 0;
+      const rpe = document.getElementById('wRpe').value;
+      const biset = document.getElementById('wBiset').checked ? ' [Bi-Set]' : '';
+      state.muscleSets[muscle] = (state.muscleSets[muscle] || 0) + sets;
+      state.workouts.unshift(`${ex} (${muscle}) — ${sets}x${reps} @ ${load}kg • RPE ${rpe}${biset}`);
+      document.getElementById('workoutHistory').innerHTML = state.workouts.map(w => `<li class="p-2 rounded-lg bg-slate-900 border border-slate-800">${w}</li>`).join('');
+      renderMuscleVolume();
+      renderStoryCard();
+    }
+
+    function renderMuscleVolume() {
+      const el = document.getElementById('muscleVolumeList');
+      el.innerHTML = Object.entries(state.muscleSets).map(([m, s]) => {
+        const color = s < 10 ? '#f59e0b' : s <= 20 ? '#10b981' : '#ef4444';
+        const svgEl = document.getElementById('svg-' + m);
+        if (svgEl) svgEl.setAttribute('fill', color);
+        return `<div><div class="flex justify-between mb-1"><span>${m}</span><span>${s} / 20 séries</span></div><div class="w-full bg-slate-800 h-2 rounded-full"><div style="width:${Math.min(100, s * 5)}%;background:${color}" class="h-2 rounded-full"></div></div></div>`;
+      }).join('');
+    }
+
+    function calc1RM() {
+      const w = parseFloat(document.getElementById('rmLoad').value) || 0;
+      const r = parseFloat(document.getElementById('rmReps').value) || 1;
+      const epley = w * (1 + r / 30);
+      const brzycki = r < 37 ? w * (36 / (37 - r)) : w;
+      document.getElementById('rmEpley').textContent = epley.toFixed(1) + ' kg';
+      document.getElementById('rmBrzycki').textContent = brzycki.toFixed(1) + ' kg';
+    }
+
+    function calcPlates() {
+      const total = parseFloat(document.getElementById('plateTarget').value) || 20;
+      let perSide = Math.max(0, (total - 20) / 2);
+      const plates = [25, 20, 15, 10, 5, 2.5, 1.25];
+      const used = [];
+      plates.forEach(p => { while (perSide >= p - 0.001) { used.push(p + 'kg'); perSide -= p; } });
+      document.getElementById('plateResult').textContent = used.length ? 'Cada lado: ' + used.join(' + ') : 'Apenas barra olímpica (20kg)';
+    }
+
+    function initTaco() {
+      const tbody = document.getElementById('tacoTableBody');
+      const sFrom = document.getElementById('subFrom');
+      const sTo = document.getElementById('subTo');
+      tbody.innerHTML = TACO_DB.map(f => `<tr><td class="py-2 font-medium text-white">${f.name}</td><td>${f.kcal}</td><td>${f.prot}</td><td>${f.carb}</td><td>${f.fat}</td></tr>`).join('');
+      const opts = TACO_DB.map(f => `<option value="${f.id}">${f.name}</option>`).join('');
+      sFrom.innerHTML = opts; sTo.innerHTML = opts; sFrom.value = 'arroz'; sTo.value = 'batata';
+      calcSubstitution();
+    }
+
+    function parseTacoText() {
+      const txt = document.getElementById('tacoInput').value.toLowerCase();
+      const parts = txt.split(',');
+      const log = document.getElementById('tacoLog');
+      parts.forEach(part => {
+        const m = part.match(/(\d+)\s*g\s*(.+)/);
+        if (!m) return;
+        const g = parseFloat(m[1]);
+        const q = m[2].trim();
+        const food = TACO_DB.find(f => f.name.toLowerCase().includes(q) || f.id.includes(q));
+        if (food) {
+          const k = Math.round((food.kcal * g) / 100);
+          const p = +((food.prot * g) / 100).toFixed(1);
+          state.kcal += k; state.prot = +(state.prot + p).toFixed(1);
+          log.innerHTML = `<li class="p-2 rounded bg-slate-900">${g}g ${food.name} → ${k} kcal • ${p}g P</li>` + log.innerHTML;
+        }
+      });
+      document.getElementById('kpiKcal').textContent = state.kcal;
+      document.getElementById('kpiProt').textContent = state.prot;
+      const kt = parseFloat(document.getElementById('kpiKcalTarget').textContent) || 2450;
+      const pt = parseFloat(document.getElementById('kpiProtTarget').textContent) || 160;
+      document.getElementById('barKcal').style.width = Math.min(100, (state.kcal / kt) * 100) + '%';
+      document.getElementById('barProt').style.width = Math.min(100, (state.prot / pt) * 100) + '%';
+      renderStoryCard();
+    }
+
+    function calcSubstitution() {
+      const from = TACO_DB.find(f => f.id === document.getElementById('subFrom').value);
+      const to = TACO_DB.find(f => f.id === document.getElementById('subTo').value);
+      const grams = parseFloat(document.getElementById('subGrams').value) || 0;
+      const type = document.getElementById('subType').value;
+      if (!from || !to) return;
+      const targetVal = to[type];
+      const eq = targetVal > 0 ? Math.round((from[type] * grams) / targetVal) : 0;
+      document.getElementById('subResult').textContent = targetVal > 0
+        ? `${grams}g de ${from.name} equivalem a ${eq}g de ${to.name}.`
+        : `${to.name} possui 0 neste macronutriente para troca direta.`;
+    }
+
+    function renderStoryCard() {
+      const c = document.getElementById('storyCanvas');
+      const ctx = c.getContext('2d');
+      const grad = ctx.createLinearGradient(0, 0, 0, 480);
+      grad.addColorStop(0, '#06090f'); grad.addColorStop(1, '#064e3b');
+      ctx.fillStyle = grad; ctx.fillRect(0, 0, 270, 480);
+      ctx.fillStyle = '#10b981'; ctx.font = 'bold 20px sans-serif'; ctx.fillText('PULSEFORGE OS', 24, 52);
+      ctx.fillStyle = '#e2e8f0'; ctx.font = '13px sans-serif'; ctx.fillText('Bio-Adaptive Summary', 24, 76);
+      ctx.fillStyle = '#ffffff'; ctx.font = 'bold 26px sans-serif';
+      ctx.fillText(`Prontidão: ${document.getElementById('readinessScore').textContent}/100`, 24, 150);
+      ctx.fillText(`${state.kcal} kcal`, 24, 200);
+      ctx.fillText(`${state.prot}g Proteína`, 24, 240);
+      ctx.font = '14px sans-serif'; ctx.fillStyle = '#94a3b8';
+      ctx.fillText(`Séries registradas: ${state.workouts.length}`, 24, 300);
+      ctx.fillText('TACO 4ª Ed. • Zero GPS', 24, 440);
+    }
+
+    function downloadStoryCard() {
+      const a = document.createElement('a');
+      a.download = 'pulseforge-card-9x16.png';
+      a.href = document.getElementById('storyCanvas').toDataURL('image/png');
+      a.click();
+    }
+
+    async function deriveKey(password, salt) {
+      const enc = new TextEncoder();
+      const keyMat = await crypto.subtle.importKey('raw', enc.encode(password), 'PBKDF2', false, ['deriveKey']);
+      return crypto.subtle.deriveKey({ name: 'PBKDF2', salt, iterations: 100000, hash: 'SHA-256' }, keyMat, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']);
+    }
+
+    async function encryptVault() {
+      const pass = document.getElementById('vaultPass').value || 'pulseforge';
+      const salt = crypto.getRandomValues(new Uint8Array(16));
+      const iv = crypto.getRandomValues(new Uint8Array(12));
+      const key = await deriveKey(pass, salt);
+      const data = new TextEncoder().encode(JSON.stringify({ state, ts: Date.now() }));
+      const ct = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, data);
+      const blob = { salt: Array.from(salt), iv: Array.from(iv), ct: Array.from(new Uint8Array(ct)) };
+      document.getElementById('vaultOutput').value = JSON.stringify(blob);
+    }
+
+    async function decryptVault() {
+      try {
+        const pass = document.getElementById('vaultPass').value || 'pulseforge';
+        const blob = JSON.parse(document.getElementById('vaultOutput').value);
+        const key = await deriveKey(pass, new Uint8Array(blob.salt));
+        const pt = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: new Uint8Array(blob.iv) }, key, new Uint8Array(blob.ct));
+        document.getElementById('vaultOutput').value = new TextDecoder().decode(pt);
+      } catch (e) {
+        alert('Falha ao descriptografar: senha incorreta ou blob inválido.');
+      }
+    }
+
+    calcReadiness();
+    updateTdeeChart();
+    renderMuscleVolume();
+    calc1RM();
+    calcPlates();
+    initTaco();
+    renderStoryCard();
+  </script>
+</body>
+</html>
